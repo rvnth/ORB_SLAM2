@@ -471,6 +471,37 @@ void System::SaveTrajectoryKITTI(const string &filename)
     cout << endl << "trajectory saved!" << endl;
 }
 
+void SaveMapPoints(const string &filename)
+{
+    const vector<MapPoint*> &vpMPs = mpMap->GetAllMapPoints();
+
+    ofstream f;
+    f.open(filename);
+
+    f << "ply" << endl
+      << "format ascii 1.0" << endl
+    // << "comment author: Revanth N R" << endl
+      << "element vertex " << vpMPs.size() << endl
+      << "property float x" << endl
+      << "property float y" << endl
+      << "property float z" << endl
+      << "property uchar red" << endl
+      << "property uchar green" << endl
+      << "property uchar blue" << endl
+      << "end_header" << endl;
+
+    for(size_t i=0, iend=vpMPs.size(); i<iend;i++)
+    {
+        if(vpMPs[i]->isBad())
+            continue;
+        cv::Mat pos = vpMPs[i]->GetWorldPos();
+        f << pos.at<float>(0) << " " << pos.at<float>(1) << " " << pos.at<float>(2)
+          << " " << endl;
+    }
+
+    f.close();
+}
+
 int System::GetTrackingState()
 {
     unique_lock<mutex> lock(mMutexState);

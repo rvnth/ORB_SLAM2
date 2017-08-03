@@ -112,6 +112,10 @@ public:
     // See format details at: http://www.cvlibs.net/datasets/kitti/eval_odometry.php
     void SaveTrajectoryKITTI(const string &filename);
 
+    // Save reconstructed map points in PLY format
+    // Call first Shutdown()
+    void SaveMapPoints(const string &filename);
+
     // TODO: Save/Load functions
     // SaveMap(const string &filename);
     // LoadMap(const string &filename);
