@@ -39,12 +39,13 @@ class Frame;
 class MapPoint
 {
 public:
-    MapPoint(const cv::Mat &Pos, KeyFrame* pRefKF, Map* pMap);
-    MapPoint(const cv::Mat &Pos,  Map* pMap, Frame* pFrame, const int &idxF);
+    MapPoint(const cv::Mat &Pos, KeyFrame* pRefKF, Map* pMap, const cv::Mat &Rgb);
+    MapPoint(const cv::Mat &Pos, Map* pMap, Frame* pFrame, const int &idxF, const cv::Mat &Rgb);
 
     void SetWorldPos(const cv::Mat &Pos);
     cv::Mat GetWorldPos();
 
+    cv::Mat GetColor();
     cv::Mat GetNormal();
     KeyFrame* GetReferenceKeyFrame();
 
@@ -116,6 +117,9 @@ protected:
 
      // Position in absolute coordinates
      cv::Mat mWorldPos;
+
+     // Color of the point
+     cv::Mat mColor;
 
      // Keyframes observing the point and associated index in keyframe
      std::map<KeyFrame*,size_t> mObservations;

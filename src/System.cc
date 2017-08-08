@@ -471,7 +471,7 @@ void System::SaveTrajectoryKITTI(const string &filename)
     cout << endl << "trajectory saved!" << endl;
 }
 
-void SaveMapPoints(const string &filename)
+void System::SaveMapPoints(const string &filename)
 {
     const vector<MapPoint*> &vpMPs = mpMap->GetAllMapPoints();
 
@@ -495,8 +495,10 @@ void SaveMapPoints(const string &filename)
         if(vpMPs[i]->isBad())
             continue;
         cv::Mat pos = vpMPs[i]->GetWorldPos();
+        cv::Mat rgb = vpMPs[i]->GetColor();
         f << pos.at<float>(0) << " " << pos.at<float>(1) << " " << pos.at<float>(2)
-          << " " << endl;
+          << " " << rgb.at<float>(0) << " " << rgb.at<float>(1) << " " << rgb.at<float>(2)
+          << endl;
     }
 
     f.close();

@@ -315,7 +315,7 @@ void LocalMapping::CreateNewMapPoints()
 
             cosParallaxStereo = min(cosParallaxStereo1,cosParallaxStereo2);
 
-            cv::Mat x3D;
+            cv::Mat x3D, color;
             if(cosParallaxRays<cosParallaxStereo && cosParallaxRays>0 && (bStereo1 || bStereo2 || cosParallaxRays<0.9998))
             {
                 // Linear Triangulation Method
@@ -335,15 +335,18 @@ void LocalMapping::CreateNewMapPoints()
 
                 // Euclidean coordinates
                 x3D = x3D.rowRange(0,3)/x3D.at<float>(3);
+                color = (cv::Mat_<float>(3,1)<< 255,255,255);
 
             }
             else if(bStereo1 && cosParallaxStereo1<cosParallaxStereo2)
             {
-                x3D = mpCurrentKeyFrame->UnprojectStereo(idx1);                
+                x3D = mpCurrentKeyFrame->UnprojectStereo(idx1);
+                color = mpCurrentKeyFrame->mvRGB[idx1];
             }
             else if(bStereo2 && cosParallaxStereo2<cosParallaxStereo1)
             {
                 x3D = pKF2->UnprojectStereo(idx2);
+                color = pKF2->mvRGB[idx2];
             }
             else
                 continue; //No stereo and very low parallax
@@ -431,7 +434,7 @@ void LocalMapping::CreateNewMapPoints()
                 continue;
 
             // Triangulation is succesfull
-            MapPoint* pMP = new MapPoint(x3D,mpCurrentKeyFrame,mpMap);
+            MapPoint* pMP = new MapPoint(x3D,mpCurrentKeyFrame,mpMap,color);
 
             pMP->AddObservation(mpCurrentKeyFrame,idx1);            
             pMP->AddObservation(pKF2,idx2);
