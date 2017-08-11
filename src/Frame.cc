@@ -171,7 +171,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
 }
 
 
-Frame::Frame(const cv::Mat &imGray, const double &timeStamp, const cv::&imRGB, ORBextractor* extractor,ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth)
+Frame::Frame(const cv::Mat &imGray, const double &timeStamp, const cv::Mat &imRGB, ORBextractor* extractor,ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth)
     :mpORBvocabulary(voc),mpORBextractorLeft(extractor),mpORBextractorRight(static_cast<ORBextractor*>(NULL)),
      mTimeStamp(timeStamp), mK(K.clone()),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth)
 {
@@ -403,6 +403,8 @@ void Frame::ComputeBoW()
 
 void Frame::UndistortKeyPoints()
 {
+    mvRGB = vector<cv::Mat>(N,(cv::Mat_<float>(3,1)<< 255, 255, 255));
+
     if(mDistCoef.at<float>(0)==0.0)
     {
         mvKeysUn=mvKeys;
@@ -431,14 +433,22 @@ void Frame::UndistortKeyPoints()
         kp.pt.y=mat.at<float>(i,1);
         mvKeysUn[i]=kp;
     }
-    mvRGB = vector<cv::Mat>(N,(cv::Mat_<float>(3,1)<< 255, 255, 255));
 }
 
-void Frame::UndistortKeyPoints(cv::Mat &imRGB)
+void Frame::UndistortKeyPoints(const cv::Mat &imRGB)
 {
     if(mDistCoef.at<float>(0)==0.0)
     {
         mvKeysUn=mvKeys;
+        mvRGB.resize(N);
+        for(int i=0; i<N; i++)
+        {
+            cv::Vec3b bgr = imRGB.at<cv::Vec3b>(mvKeysUn[i].pt.y,mvKeysUn[i].pt.x);
+            const float r = bgr.val[2];
+            const float g = bgr.val[1];
+            const float b = bgr.val[0];
+            mvRGB[i] = (cv::Mat_<float>(3,1) << r, g, b);
+        }
         return;
     }
 
@@ -469,7 +479,7 @@ void Frame::UndistortKeyPoints(cv::Mat &imRGB)
     mvRGB.resize(N);
     for(int i=0; i<N; i++)
     {
-        cv::Vec3b &bgr = imRGB.at<Vec3b>(kp.pt.y,kp.pt.x);
+        cv::Vec3b bgr = imRGB.at<cv::Vec3b>(mvKeysUn[i].pt.y,mvKeysUn[i].pt.x);
         const float r = bgr.val[2];
         const float g = bgr.val[1];
         const float b = bgr.val[0];
@@ -723,7 +733,7 @@ cv::Mat Frame::UnprojectStereo(const int &i)
         return cv::Mat();
 }
 
-cv::Mat Frame::GetRGB(const int &i)
+cv::Mat Frame::GetColor(const int &i)
 {
     return mvRGB[i];
 }

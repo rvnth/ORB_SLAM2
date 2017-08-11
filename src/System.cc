@@ -485,6 +485,9 @@ void System::SaveMapPoints(const string &filename)
       << "property float x" << endl
       << "property float y" << endl
       << "property float z" << endl
+      << "property float nx" << endl
+      << "property float ny" << endl
+      << "property float nz" << endl
       << "property uchar red" << endl
       << "property uchar green" << endl
       << "property uchar blue" << endl
@@ -495,8 +498,10 @@ void System::SaveMapPoints(const string &filename)
         if(vpMPs[i]->isBad())
             continue;
         cv::Mat pos = vpMPs[i]->GetWorldPos();
+        cv::Mat norm = vpMPs[i]->GetNormal();
         cv::Mat rgb = vpMPs[i]->GetColor();
         f << pos.at<float>(0) << " " << pos.at<float>(1) << " " << pos.at<float>(2)
+          << " " << norm.at<float>(0) << " " << norm.at<float>(1) << " " << norm.at<float>(2)
           << " " << rgb.at<float>(0) << " " << rgb.at<float>(1) << " " << rgb.at<float>(2)
           << endl;
     }
